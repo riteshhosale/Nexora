@@ -8,6 +8,7 @@ const { Db } = require("mongodb");
 require("dotenv").config({ path: "./.env" });
 
 const AuthRoutes = require("./routes/AuthRoutes");
+const userRoutes = require("./routes/UserRoutes");
 
 const app = express();
 
@@ -25,5 +26,6 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1/auth", AuthRoutes);
+app.use("/api/v1/users", userRoutes);
 
 module.exports = app;
