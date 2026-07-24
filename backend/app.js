@@ -9,6 +9,7 @@ require("dotenv").config({ path: "./.env" });
 
 const AuthRoutes = require("./routes/AuthRoutes");
 const userRoutes = require("./routes/UserRoutes");
+const postRoutes = require("./routes/PostRoutes");
 
 const app = express();
 
@@ -27,5 +28,6 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/auth", AuthRoutes);
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/posts", postRoutes);
 
 module.exports = app;

@@ -2,35 +2,49 @@ const mongoose = require("mongoose");
 
 const postSchema = new mongoose.Schema(
     {
-        user: {
+        author: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true,
+            required: true
         },
 
-        caption: String,
+        caption: {
+            type: String,
+            trim: true,
+            maxlength: 500,
+            default: "",
+        },
 
-        image: String,
-
-        Video: String,
-
-        hashtags: [String],
-
-        location: String,
+        images: [
+            {
+                url: {
+                    type: String,
+                    required: true,
+                },
+                public_id: {
+                    type: String,
+                    required: true,
+                },
+            },
+        ],
 
         likes: [
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "User",
+                required: true
             },
         ],
 
-        comments: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Comment",
-            },
-        ],
+        commentsCount: {
+            type: Number,
+            default: 0,
+        },
+
+        isEdited: {
+            type: Boolean,
+            default: false,
+        },
     },
     { timestamps: true }
 );
