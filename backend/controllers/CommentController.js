@@ -60,7 +60,80 @@ const getComments = async (req, res) => {
     }
 };
 
+const updateComment = async (req, res) => {
+    try {
+        const { text } = req.body;
+
+        const comment = await Comment.findById(req.params.commentId);
+
+        if (!comment) {
+            return res.status(404).json({
+                success: false,
+                message: "Comment not found",
+            });
+        }
+
+        if (comment.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to update this comment",
+            });
+        }
+
+        comment.text = text;
+        await comment.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Comment updated successfully",
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message || "Server Error",
+        });
+    }
+};
+
+const deleteComment = async (req, res) => {
+    try {
+        const comment = await Comment.findById(req.params.commentId);
+
+        if (!comment) {
+            return res.status(404).json({
+                success: false,
+                message: "Comment not found",
+            });
+        }
+
+        if (comment.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: "Unauthorized",
+            });
+        }
+
+        await Post.findByIdAndUpdate(comment.post, {
+            $inc: { commentsCount: -1 },
+        });
+
+        await comment.deleteOne();
+
+        res.status(200).json({
+            success: true,
+            message: "Comment deleted successfully",
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
     addComment,
     getComments,
+    updateComment,
+    deleteComment,
 };
