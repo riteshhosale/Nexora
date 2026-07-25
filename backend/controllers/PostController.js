@@ -137,10 +137,58 @@ const deletePost = async (req, res) => {
     }
 };
 
+const likeUnlikePost = async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: "Post not found",
+            });
+        }
+
+        const userId = req.user._id.toString();
+        const isLiked = post.likes.some(
+            (id) => id.toString() === userId
+        );
+
+        if (isLiked) {
+            post.likes = post.likes.filter(
+                (id) => id.toString() !== userId
+            );
+
+            await post.save();
+
+            return res.status(200).json({
+                success: true,
+                message: "Post unliked successfully",
+                likesCount: post.likes.length,
+            });
+        }
+
+        post.likes.push(req.user._id);
+
+        await post.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Post liked successfully",
+            likesCount: post.likes.length,
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message || "Server Error",
+        });
+    }
+};
+
 module.exports = {
     createPost,
     getPosts,
     getPost,
     updatePost,
     deletePost,
+    likeUnlikePost,
 };
