@@ -6,12 +6,11 @@ const { protect } = require("../middleware/AuthMiddleware");
 const {
     getUserProfile,
     updateProfile,
+    followUnfollowUser,
 } = require("../controllers/UserController");
 
-// Get user profile
 router.get("/:username", protect, getUserProfile);
-
-// Update logged-in user's profile
 router.put("/profile", protect, updateProfile);
+router.put("/:id/follow", protect, followUnfollowUser);
 
 module.exports = router;
