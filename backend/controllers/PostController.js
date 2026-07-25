@@ -1,4 +1,5 @@
 const Post = require("../models/Post");
+const User = require("../models/User");
 
 const createPost = async (req, res) => {
     try {
@@ -184,6 +185,49 @@ const likeUnlikePost = async (req, res) => {
     }
 };
 
+const saveUnsavePost = async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: "Post not found",
+            });
+        }
+
+        const user = await User.findById(req.user._id);
+
+        const isSaved = user.savedPosts.includes(post._id);
+
+        if (isSaved) {
+            user.savedPosts.pull(post._id);
+
+            await user.save();
+
+            return res.status(200).json({
+                success: true,
+                message: "Post removed from saved posts",
+            });
+        }
+
+        user.savedPosts.push(post._id);
+
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Post saved successfully",
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
     createPost,
     getPosts,
@@ -191,4 +235,5 @@ module.exports = {
     updatePost,
     deletePost,
     likeUnlikePost,
+    saveUnsavePost,
 };

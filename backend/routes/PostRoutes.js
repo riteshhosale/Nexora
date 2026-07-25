@@ -8,6 +8,7 @@ const {
     updatePost,
     deletePost,
     likeUnlikePost,
+    saveUnsavePost,
 } = require("../controllers/PostController");
 
 const { protect } = require("../middleware/AuthMiddleware");
@@ -18,4 +19,5 @@ router.get("/:id", getPost);
 router.put("/:id", protect, updatePost);
 router.delete("/:id", protect, deletePost);
 router.put("/:id/like", protect, likeUnlikePost);
+router.put("/:id/save", protect, saveUnsavePost);
 module.exports = router;

@@ -13,4 +13,5 @@ router.get("/:username", protect, getUserProfile);
 router.put("/profile", protect, updateProfile);
 router.put("/:id/follow", protect, followUnfollowUser);
 
+
 module.exports = router;
