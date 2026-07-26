@@ -41,9 +41,15 @@ const userSchema = new mongoose.Schema(
             maxlength: 200,
         },
 
-        profilePicture: {
+       profilePicture: {
+        url: {
             type: String,
-            default: "",
+            default: ""
+            },
+        public_id: {
+            type: String,
+            default: ""
+            },
         },
 
         coverPicture: {
