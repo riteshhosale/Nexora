@@ -1,6 +1,8 @@
 const Follow = require("../models/Follow");
 const User = require("../models/User");
 const Notification = require("../models/Notification");
+const { getIO } = require("../config/socket");
+const { getUserSocket } = require("../socket/users");
 
 const followUnfollowUser = async (req, res) => {
   try {
@@ -60,6 +62,18 @@ const followUnfollowUser = async (req, res) => {
         receiver: targetUser._id,
         type: "follow",
       });
+    }
+
+    const receiverSocket = getUserSocket(targetUser._id);
+
+    if (receiverSocket) {
+      const io = getIO();
+
+      const populatedNotification = await Notification.findById(
+        notification._id,
+      ).populate("sender", "name username profilePicture");
+
+      io.to(receiverSocket).emit("newNotification", populatedNotification);
     }
 
     return res.status(200).json({

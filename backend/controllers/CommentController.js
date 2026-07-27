@@ -1,10 +1,19 @@
 const Comment = require("../models/Comment");
 const Post = require("../models/Post");
 const Notification = require("../models/Notification");
+const { getIO } = require("../config/socket");
+const { getUserSocket } = require("../socket/users");
 
 const addComment = async (req, res) => {
   try {
     const { text } = req.body;
+
+    if (!text || text.trim() === "") {
+      return res.status(400).json({
+        success: false,
+        message: "Comment text is required",
+      });
+    }
 
     const post = await Post.findById(req.params.id);
 
@@ -15,36 +24,59 @@ const addComment = async (req, res) => {
       });
     }
 
+    // Create comment
     const comment = await Comment.create({
       post: post._id,
       user: req.user._id,
       text,
     });
 
+    // Update comment count
     post.commentsCount += 1;
     await post.save();
 
-    const populatedComment = await Comment.findById(comment._id).populate(
-      "user",
-      "fullName username profilePicture",
-    );
+    // Populate comment
+    const populatedComment = await Comment.findById(comment._id)
+      .populate("user", "fullName username profilePicture");
 
+    // ==========================
+    // Notification + Socket.IO
+    // ==========================
     if (post.author.toString() !== req.user._id.toString()) {
-      await Notification.create({
+
+      const notification = await Notification.create({
         sender: req.user._id,
         receiver: post.author,
         post: post._id,
         type: "comment",
       });
+
+      const populatedNotification = await Notification.findById(notification._id)
+        .populate("sender", "fullName username profilePicture")
+        .populate("post", "image caption");
+
+      const receiverSocket = getUserSocket(post.author.toString());
+
+      if (receiverSocket) {
+        const io = getIO();
+
+        io.to(receiverSocket).emit(
+          "newNotification",
+          populatedNotification
+        );
+      }
     }
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: "Comment added successfully",
       comment: populatedComment,
     });
+
   } catch (error) {
-    res.status(500).json({
+    console.error(error);
+
+    return res.status(500).json({
       success: false,
       message: error.message || "Server Error",
     });

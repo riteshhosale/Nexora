@@ -13,13 +13,12 @@ const removeUser = (socketId) => {
     }
 };
 
-const getUserScoket = (userId) => {
-    return
-    onlineUsers.get(userId.toString());
+const getUserSocket = (userId) => {
+    return onlineUsers.get(userId.toString());
 };
 
 module.exports = {
     addUser,
     removeUser,
-    getUserScoket,
+    getUserSocket,
 };
