@@ -8,7 +8,7 @@ const Register = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    name: "",
+    fullName: "",
     username: "",
     email: "",
     password: "",
@@ -31,7 +31,7 @@ const Register = () => {
 
     try {
       await register({
-        name: formData.name,
+        fullName: formData.fullName,
         username: formData.username,
         email: formData.email,
         password: formData.password,
