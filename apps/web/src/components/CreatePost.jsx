@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { FaImage, FaPaperPlane } from "react-icons/fa";
 import { useAuth } from "../hooks/useAuth";
+import { createPost } from "../api/postApi";
+import { toast } from "react-hot-toast";
 
 const CreatePost = () => {
   const { user } = useAuth();
@@ -12,18 +14,25 @@ const CreatePost = () => {
     setImage(e.target.files[0]);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    const formData = new FormData();
 
-    console.log({
-      caption,
-      image,
-    });
+formData.append("caption", caption);
 
-    // Backend Integration comes next
+if (image) {
+  formData.append("image", image);
+}
 
-    setCaption("");
-    setImage(null);
+try {
+  await createPost(formData);
+
+  toast.success("Post created!");
+
+  setCaption("");
+  setImage(null);
+} catch (err) {
+  toast.error(err.response?.data?.message || "Failed to create post");
+}
   };
 
   return (

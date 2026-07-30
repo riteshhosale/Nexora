@@ -11,6 +11,7 @@ const suggestedUsers = [
     id: 2,
     fullName: "Jane Smith",
     username: "janesmith",
+    password: "123456",
     avatar: "https://i.pravatar.cc/150?img=2",
   },
   {
